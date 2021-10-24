@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_sign_in: ^5.0.7
-  firebase_auth: ^3.0.1
+  google_sign_in: ^5.1.0
+  firebase_auth: ^3.1.4
 
 dev_dependencies:
   flutter_test:
