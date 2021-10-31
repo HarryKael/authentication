@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class Authentication {
@@ -10,7 +11,7 @@ class Authentication {
     auth.authStateChanges().listen((User? user2) {
       user = user2;
       if (user != null) {
-        print(
+        debugPrint(
             '============= Change =============== EmailVerified ${user!.emailVerified}');
       }
     });
@@ -28,7 +29,7 @@ class Authentication {
   Future<bool?> checkEmailVerificaton() async {
     if (user != null) {
       return user!.reload().then((_) {
-        print(
+        debugPrint(
             '=================Realoading================= ${user!.emailVerified}');
         return user!.emailVerified;
       }).onError((error, stackTrace) {
