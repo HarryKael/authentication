@@ -98,14 +98,14 @@ class Authentication {
   //       print('Wrong password provided for that user.');
   //     }
 
-  Future<void> signOut() {
-    return _googleSignIn.isSignedIn().then((value) {
-      if (value) {
-        _googleSignIn.signOut().then((value) => auth.signOut());
-      } else {
-        auth.signOut();
-      }
-    });
+  Future<void> signOut() async {
+    bool value = await _googleSignIn.isSignedIn();
+    if (value) {
+      await _googleSignIn.signOut();
+      await auth.signOut();
+    } else {
+      await auth.signOut();
+    }
   }
 
   Future<void> sendPasswordResetEmail({required String email}) {
