@@ -63,6 +63,7 @@ class Authentication {
   Future<UserCredential?> signIn(
       {required String email, required String password}) {
     return auth.signInWithEmailAndPassword(email: email, password: password);
+    // changed
   }
 
   Future<UserCredential?> signInWithGoogle() async {
