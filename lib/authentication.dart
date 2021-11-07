@@ -63,12 +63,9 @@ class Authentication {
   //       print('The account already exists for that email.');
   //     }
 
-  Future<String?> signIn({required String email, required String password}) {
-    return auth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((UserCredential userCredential) {
-      return userCredential.user!.uid;
-    });
+  Future<UserCredential?> signIn(
+      {required String email, required String password}) {
+    return auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
   Future<UserCredential?> signInWithGoogle() async {
