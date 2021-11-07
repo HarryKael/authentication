@@ -48,13 +48,10 @@ class Authentication {
     }
   }
 
-  Future<String> registration(
+  Future<UserCredential> registration(
       {required String email, required String password}) {
-    return auth
-        .createUserWithEmailAndPassword(email: email, password: password)
-        .then((value) {
-      return value.user!.uid;
-    });
+    return auth.createUserWithEmailAndPassword(
+        email: email, password: password);
   }
 
   // if (e.code == 'weak-password') {
