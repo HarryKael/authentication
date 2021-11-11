@@ -53,6 +53,7 @@ class Authentication {
     return auth.createUserWithEmailAndPassword(
         email: email, password: password);
   }
+  //klk
 
   // if (e.code == 'weak-password') {
   //       print('The password provided is too weak.');
