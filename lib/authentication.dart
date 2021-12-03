@@ -2,6 +2,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+class Response {
+  UserCredential? userCredential;
+  String result;
+  Response({
+    this.userCredential,
+    required this.result,
+  });
+
+  Response copyWith({
+    UserCredential? userCredential,
+    String? result,
+  }) {
+    return Response(
+      userCredential: userCredential ?? this.userCredential,
+      result: result ?? this.result,
+    );
+  }
+
+  @override
+  String toString() =>
+      'Response(userCredential: $userCredential, result: $result)';
+}
+
 class Authentication {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -28,30 +51,42 @@ class Authentication {
 
   Future<bool?> checkEmailVerificaton() async {
     if (user != null) {
-      return user!.reload().then((_) {
-        debugPrint(
-            '=================Realoading================= ${user!.emailVerified}');
-        return user!.emailVerified;
-      }).onError((error, stackTrace) {
+      try {
+        return user!.reload().then((_) {
+          debugPrint(
+              '=================Realoading================= ${user!.emailVerified}');
+          return user!.emailVerified;
+        }).onError((error, stackTrace) {
+          return false;
+        });
+      } catch (e) {
         return false;
-      });
+      }
     } else {
       return null;
     }
   }
 
   void sendEmailVerification() async {
-    User? _user = auth.currentUser;
+    try {
+      User? _user = auth.currentUser;
 
-    if (_user != null && !_user.emailVerified) {
-      _user.sendEmailVerification();
-    }
+      if (_user != null && !_user.emailVerified) {
+        _user.sendEmailVerification();
+      }
+    } catch (e) {}
   }
 
-  Future<UserCredential> registration(
-      {required String email, required String password}) {
-    return auth.createUserWithEmailAndPassword(
-        email: email, password: password);
+  Future<Response> registration(
+      {required String email, required String password}) async {
+    try {
+      UserCredential _userCredential = await auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      return Response(userCredential: _userCredential, result: 'ok');
+    } on FirebaseAuthException catch (e) {
+      return Response(
+          result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+    }
   }
   //klk
 
@@ -61,9 +96,16 @@ class Authentication {
   //       print('The account already exists for that email.');
   //     }
 
-  Future<UserCredential?> signIn(
-      {required String email, required String password}) {
-    return auth.signInWithEmailAndPassword(email: email, password: password);
+  Future<Response> signIn(
+      {required String email, required String password}) async {
+    try {
+      UserCredential _userCredential = await auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      return Response(userCredential: _userCredential, result: 'ok');
+    } on FirebaseAuthException catch (e) {
+      return Response(
+          result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+    }
     // changed
   }
 
@@ -104,8 +146,14 @@ class Authentication {
     }
   }
 
-  Future<void> sendPasswordResetEmail({required String email}) {
-    return auth.sendPasswordResetEmail(email: email);
+  Future<Response> sendPasswordResetEmail({required String email}) async {
+    try {
+      await auth.sendPasswordResetEmail(email: email);
+      return Response(result: 'ok');
+    } on FirebaseAuthException catch (e) {
+      return Response(
+          result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+    }
   }
 
   Future<void> confirmPasswordReset(
