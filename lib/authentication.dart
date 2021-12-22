@@ -51,14 +51,16 @@ class Authentication {
 
   Future<bool?> checkEmailVerificaton() async {
     if (user != null) {
+      // debugPrint(
+      //     '=================Realoading================= ${user!.emailVerified}');
+      // return user!.emailVerified;
       try {
-        return user!.reload().then((_) {
-          debugPrint(
-              '=================Realoading================= ${user!.emailVerified}');
-          return user!.emailVerified;
-        }).onError((error, stackTrace) {
-          return false;
-        });
+        await user!.reload();
+        debugPrint(
+            '=================Realoading================= ${auth.currentUser!.emailVerified}');
+
+        user = auth.currentUser;
+        return auth.currentUser!.emailVerified;
       } catch (e) {
         return false;
       }
@@ -84,17 +86,26 @@ class Authentication {
           .createUserWithEmailAndPassword(email: email, password: password);
       return Response(userCredential: _userCredential, result: 'ok');
     } on FirebaseAuthException catch (e) {
-      return Response(
-          result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+      switch (e.code) {
+        case 'email-already-in-use':
+          return Response(
+              result:
+                  'There already exists an account with the given email address.');
+        case 'invalid-email':
+          return Response(result: 'The email address is not valid.');
+
+        case 'operation-not-allowed':
+          return Response(result: 'email/password accounts are not enabled.');
+
+        case 'weak-password':
+          return Response(result: 'The password is not strong enough.');
+
+        default:
+          return Response(
+              result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+      }
     }
   }
-  //klk
-
-  // if (e.code == 'weak-password') {
-  //       print('The password provided is too weak.');
-  //     } else if (e.code == 'email-already-in-use') {
-  //       print('The account already exists for that email.');
-  //     }
 
   Future<Response> signIn(
       {required String email, required String password}) async {
@@ -103,8 +114,28 @@ class Authentication {
           email: email, password: password);
       return Response(userCredential: _userCredential, result: 'ok');
     } on FirebaseAuthException catch (e) {
-      return Response(
-          result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+      switch (e.code) {
+        case 'invalid-email':
+          return Response(result: 'The email address is not valid.');
+
+        case 'user-disabled':
+          return Response(
+              result:
+                  'The user corresponding to the given email has been disabled.');
+
+        case 'user-not-found':
+          return Response(
+              result: 'There is no user corresponding to the given email.');
+
+        case 'wrong-password':
+          return Response(
+              result:
+                  'The password is invalid for the given email, or the account corresponding to the email does not have a password set.');
+
+        default:
+          return Response(
+              result: 'Failed -> code: ${e.code}; message: ${e.message!}');
+      }
     }
     // changed
   }
