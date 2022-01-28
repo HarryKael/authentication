@@ -40,6 +40,23 @@ class Authentication {
     });
   }
 
+  String? validateEmail(String email) {
+    final RegExp _regExp = RegExp(r"^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$");
+    if (_regExp.hasMatch(email)) {
+      return null;
+    } else {
+      return "Please provide a valid email";
+    }
+  }
+
+  String? validatePassword(String password) {
+    if (password.length < 8) {
+      return "Password must be more than 8 characters";
+    } else {
+      return null;
+    }
+  }
+
   String isLogged() {
     User? _user = auth.currentUser;
     if (_user != null) {
