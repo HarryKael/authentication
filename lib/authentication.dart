@@ -99,8 +99,9 @@ class Authentication {
   Future<Response> registration(
       {required String email, required String password}) async {
     try {
-      UserCredential _userCredential = await auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential _userCredential =
+          await auth.createUserWithEmailAndPassword(
+              email: email.toString(), password: password.toString());
       return Response(userCredential: _userCredential, result: 'ok');
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -128,7 +129,7 @@ class Authentication {
       {required String email, required String password}) async {
     try {
       UserCredential _userCredential = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
+          email: email.toString(), password: password.toString());
       return Response(userCredential: _userCredential, result: 'ok');
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
