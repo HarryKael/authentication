@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -158,14 +159,14 @@ class Authentication {
     // changed
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<String?> signInWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-    if (googleUser != null) {
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+          await googleUser!.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
@@ -174,16 +175,11 @@ class Authentication {
       );
 
       // Once signed in, return the UserCredential
-      return await auth.signInWithCredential(credential);
+      return auth.signInWithCredential(credential).then((value) => 'ok');
+    } on PlatformException catch (e) {
+      return e.message;
     }
-    return null;
   }
-
-  // if (e.code == 'user-not-found') {
-  //       print('No user found for that email.');
-  //     } else if (e.code == 'wrong-password') {
-  //       print('Wrong password provided for that user.');
-  //     }
 
   Future<void> signOut() async {
     bool value = await _googleSignIn.isSignedIn();
