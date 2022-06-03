@@ -159,7 +159,7 @@ class Authentication {
     // changed
   }
 
-  Future<String?> signInWithGoogle() async {
+  Future<String> signInWithGoogle() async {
     // Trigger the authentication flow
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -177,7 +177,7 @@ class Authentication {
       // Once signed in, return the UserCredential
       return auth.signInWithCredential(credential).then((value) => 'ok');
     } on PlatformException catch (e) {
-      return e.message;
+      return e.message.toString();
     }
   }
 
